@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Points Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 30px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+            text-align: center;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 1px;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        tbody tr:hover {
+            background-color: #f8f9ff;
+            transition: background-color 0.2s;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .points {
+            font-weight: bold;
+            color: #667eea;
+            font-size: 18px;
+        }
+
+        .last-updated {
+            text-align: center;
+            color: #999;
+            font-size: 12px;
+            margin-top: 20px;
+            font-style: italic;
+        }
+
+        .add-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            font-size: 30px;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+            display: none; /* Hidden by default, show only if you want manual entry */
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .stat-value {
+                font-size: 24px;
+            }
+
+            th, td {
+                padding: 10px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Daily Points Tracker</h1>
+        <p class="subtitle">Track your progress every day</p>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-label">Total Points</div>
+                <div class="stat-value" id="totalPoints">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Days Tracked</div>
+                <div class="stat-value" id="totalDays">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Average</div>
+                <div class="stat-value" id="avgPoints">0</div>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th style="text-align: right;">Points</th>
+                </tr>
+            </thead>
+            <tbody id="pointsTable">
+                <!-- Data will be populated by JavaScript -->
+            </tbody>
+        </table>
+
+        <div class="last-updated" id="lastUpdated">Last updated: --</div>
+    </div>
+
+    <script>
+        // YOUR DATA - Update this array daily
+        const pointsData = [
+            { date: 'Nov 14', points: 75 },
+            { date: 'Nov 13', points: 82 },
+            { date: 'Nov 12', points: 68 },
+            { date: 'Nov 11', points: 91 },
+            { date: 'Nov 10', points: 77 },
+            // Add new entries here in format: { date: 'Nov 15', points: 85 },
+        ];
+
+        // Calculate statistics
+        function calculateStats() {
+            const totalPoints = pointsData.reduce((sum, entry) => sum + entry.points, 0);
+            const totalDays = pointsData.length;
+            const avgPoints = totalDays > 0 ? Math.round(totalPoints / totalDays) : 0;
+
+            document.getElementById('totalPoints').textContent = totalPoints;
+            document.getElementById('totalDays').textContent = totalDays;
+            document.getElementById('avgPoints').textContent = avgPoints;
+        }
+
+        // Populate table
+        function populateTable() {
+            const tbody = document.getElementById('pointsTable');
+            tbody.innerHTML = '';
+
+            // Reverse to show most recent first
+            const reversedData = [...pointsData].reverse();
+
+            reversedData.forEach((entry, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${entry.date}</td>
+                    <td style="text-align: right;" class="points">${entry.points}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Update last updated timestamp
+        function updateTimestamp() {
+            const now = new Date();
+            const options = { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric', 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            };
+            document.getElementById('lastUpdated').textContent = 
+                `Last updated: ${now.toLocaleDateString('en-US', options)}`;
+        }
+
+        // Initialize
+        calculateStats();
+        populateTable();
+        updateTimestamp();
+    </script>
+</body>
+</html>
