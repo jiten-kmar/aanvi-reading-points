@@ -6,7 +6,7 @@
     <meta http-equiv="Expires" content="0">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aanvi Daily Points Tracker ! - Version 2.0</title>
+    <title>Aanvi Daily Points Tracker !</title>
     <style>
         * {
             margin: 0;
@@ -16,7 +16,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
             display: flex;
@@ -45,17 +45,6 @@
             }
         }
 
-        .version-banner {
-            background: #ff6b6b;
-            color: white;
-            padding: 10px;
-            text-align: center;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            font-weight: bold;
-            font-size: 14px;
-        }
-
         h1 {
             color: #333;
             margin-bottom: 10px;
@@ -70,20 +59,78 @@
             font-size: 14px;
         }
 
+        .add-entry-form {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .form-title {
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .form-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .form-group input {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .form-group input:focus {
+            outline: 2px solid #fff;
+            outline-offset: 2px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            background: white;
+            color: #667eea;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
         .stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            grid-template-columns: repeat(2, 1fr);
             gap: 15px;
             margin-bottom: 30px;
         }
 
         .stat-card {
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             padding: 20px;
             border-radius: 15px;
             text-align: center;
             color: white;
-            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
         }
 
         .stat-label {
@@ -110,7 +157,7 @@
         }
 
         thead {
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
         }
 
@@ -129,7 +176,7 @@
         }
 
         tbody tr:hover {
-            background-color: #fff5f5;
+            background-color: #f8f9ff;
             transition: background-color 0.2s;
         }
 
@@ -139,7 +186,7 @@
 
         .points {
             font-weight: bold;
-            color: #ff6b6b;
+            color: #667eea;
             font-size: 18px;
         }
 
@@ -149,6 +196,22 @@
             font-size: 12px;
             margin-top: 20px;
             font-style: italic;
+        }
+
+        .success-message {
+            background: #4caf50;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 15px;
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         @media (max-width: 600px) {
@@ -164,6 +227,10 @@
                 font-size: 24px;
             }
 
+            .form-group {
+                grid-template-columns: 1fr;
+            }
+
             th, td {
                 padding: 10px;
                 font-size: 14px;
@@ -173,13 +240,21 @@
 </head>
 <body>
     <div class="container">
-        <div class="version-banner">
-            ✨ NEW VERSION DEPLOYED ✨
-        </div>
-        
         <h1>📚 Aanvi's Reading Points</h1>
         <p class="subtitle">Track your daily reading progress</p>
 
+        <!-- Add Entry Form -->
+        <div class="add-entry-form">
+            <div class="form-title">➕ Add Today's Points</div>
+            <div class="success-message" id="successMessage">Entry added successfully! ✨</div>
+            <div class="form-group">
+                <input type="text" id="dateInput" placeholder="Date (e.g., Nov 15)" />
+                <input type="number" id="pointsInput" placeholder="Points" min="0" />
+            </div>
+            <button class="submit-btn" onclick="addEntry()">Add Entry</button>
+        </div>
+
+        <!-- Statistics -->
         <div class="stats">
             <div class="stat-card">
                 <div class="stat-label">Total Points</div>
@@ -189,12 +264,9 @@
                 <div class="stat-label">Days Tracked</div>
                 <div class="stat-value" id="totalDays">0</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-label">Average</div>
-                <div class="stat-value" id="avgPoints">0</div>
-            </div>
         </div>
 
+        <!-- Points Table -->
         <table>
             <thead>
                 <tr>
@@ -211,21 +283,82 @@
     </div>
 
     <script>
-        // YOUR DATA - Update this array daily
-        const pointsData = [
-            { date: 'Nov 15', points: 78 },
-            // Add new entries here in format: { date: 'Nov 15', points: 85 },
+        // YOUR DATA - This gets loaded on page load
+        let pointsData = [
+            { date: 'Nov 13', points: 75 },
+            { date: 'Nov 14', points: 3 },
         ];
+
+        // Load data from localStorage if available
+        function loadData() {
+            const savedData = localStorage.getItem('aanviPointsData');
+            if (savedData) {
+                pointsData = JSON.parse(savedData);
+            }
+        }
+
+        // Save data to localStorage
+        function saveData() {
+            localStorage.setItem('aanviPointsData', JSON.stringify(pointsData));
+        }
+
+        // Add new entry
+        function addEntry() {
+            const dateInput = document.getElementById('dateInput');
+            const pointsInput = document.getElementById('pointsInput');
+            const successMessage = document.getElementById('successMessage');
+
+            const date = dateInput.value.trim();
+            const points = parseInt(pointsInput.value);
+
+            if (!date) {
+                alert('Please enter a date (e.g., Nov 15)');
+                return;
+            }
+
+            if (isNaN(points) || points < 0) {
+                alert('Please enter valid points');
+                return;
+            }
+
+            // Add new entry
+            pointsData.unshift({ date, points });
+
+            // Save to localStorage
+            saveData();
+
+            // Show success message
+            successMessage.style.display = 'block';
+            setTimeout(() => {
+                successMessage.style.display = 'none';
+            }, 3000);
+
+            // Clear inputs
+            dateInput.value = '';
+            pointsInput.value = '';
+
+            // Refresh display
+            calculateStats();
+            populateTable();
+            updateTimestamp();
+        }
+
+        // Allow Enter key to submit
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('pointsInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addEntry();
+                }
+            });
+        });
 
         // Calculate statistics
         function calculateStats() {
             const totalPoints = pointsData.reduce((sum, entry) => sum + entry.points, 0);
             const totalDays = pointsData.length;
-            const avgPoints = totalDays > 0 ? Math.round(totalPoints / totalDays) : 0;
 
             document.getElementById('totalPoints').textContent = totalPoints;
             document.getElementById('totalDays').textContent = totalDays;
-            document.getElementById('avgPoints').textContent = avgPoints;
         }
 
         // Populate table
@@ -233,10 +366,7 @@
             const tbody = document.getElementById('pointsTable');
             tbody.innerHTML = '';
 
-            // Reverse to show most recent first
-            const reversedData = [...pointsData].reverse();
-
-            reversedData.forEach((entry, index) => {
+            pointsData.forEach((entry, index) => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${entry.date}</td>
@@ -261,6 +391,7 @@
         }
 
         // Initialize
+        loadData();
         calculateStats();
         populateTable();
         updateTimestamp();
